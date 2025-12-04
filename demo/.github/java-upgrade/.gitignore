@@ -1,0 +1,15 @@
+target/
+.idea/
+*.iml
+*.class
+*.log
+*.DS_Store
+*.jar
+*.war
+*.zip
+*.db
+*.sqlite
+*~
+/.mvn
+/.settings/
+.vscode/

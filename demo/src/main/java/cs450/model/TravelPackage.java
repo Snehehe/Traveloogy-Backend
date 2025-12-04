@@ -1,29 +1,24 @@
 package cs450.model;
 
 import jakarta.persistence.*;
+import java.util.*;
 
 @Entity
-@Table(name = "packages")
+@Table(name="packages")
 public class TravelPackage {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     public Long id;
 
     public String title;
     public String description;
     public Double basePrice;
+    public Double discountPercent = 0.0;
 
-    @ManyToOne
-    @JoinColumn(name = "destination_id")
-    public Destination destination;
+    @ManyToOne public Destination destination;
+    @ManyToOne public Flight flight;
+    @ManyToOne public Stay stay;
 
-    public TravelPackage() {}
-
-    public TravelPackage(String title, String description, Double basePrice, Destination destination) {
-        this.title = title;
-        this.description = description;
-        this.basePrice = basePrice;
-        this.destination = destination;
-    }
+    @ManyToMany
+    public List<Activity> activities = new ArrayList<>();
 }

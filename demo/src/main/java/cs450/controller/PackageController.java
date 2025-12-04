@@ -1,44 +1,41 @@
 package cs450.controller;
 
-import cs450.model.Destination;
 import cs450.model.TravelPackage;
-import cs450.repository.DestinationRepository;
 import cs450.repository.TravelPackageRepository;
+
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/packages")
-@CrossOrigin("*")
+@CrossOrigin
 public class PackageController {
 
-    private final TravelPackageRepository packageRepo;
-    private final DestinationRepository destinationRepo;
+    private final TravelPackageRepository repo;
 
-    public PackageController(TravelPackageRepository p, DestinationRepository d) {
-        this.packageRepo = p;
-        this.destinationRepo = d;
-    }
-
-    @PostMapping
-    public TravelPackage create(@RequestBody TravelPackage pkg) {
-
-        // ⭐ SAFETY CHECK (no nulls)
-        if (pkg.destination == null || pkg.destination.id == null) {
-            throw new IllegalArgumentException("Destination ID cannot be null");
-        }
-
-        // ⭐ Load real destination entity
-        Destination dest = destinationRepo.findById(pkg.destination.id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid destination ID"));
-
-        // ⭐ Reassign proper object
-        pkg.destination = dest;
-
-        return packageRepo.save(pkg);
+    public PackageController(TravelPackageRepository repo) {
+        this.repo = repo;
     }
 
     @GetMapping
-    public Iterable<TravelPackage> all() {
-        return packageRepo.findAll();
+    public List<TravelPackage> all() {
+        return repo.findAll();
+    }
+
+    @PutMapping("/{id}")
+    public TravelPackage update(@PathVariable Long id, @RequestBody TravelPackage updated) {
+        TravelPackage p = repo.findById(id).orElseThrow();
+
+        if (updated.base_price != null)
+            p.base_price = updated.base_price;
+
+        if (updated.discount_percent != null)
+            p.discount_percent = updated.discount_percent;
+
+        if (updated.title != null)
+            p.title = updated.title;
+
+        return repo.save(p);
     }
 }

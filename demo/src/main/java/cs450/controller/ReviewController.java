@@ -3,39 +3,32 @@ package cs450.controller;
 import cs450.model.*;
 import cs450.repository.*;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/reviews")
+@CrossOrigin
 public class ReviewController {
 
     private final ReviewRepository repo;
-    private final UserRepository userRepo;
-    private final TravelPackageRepository pkgRepo;
+    private final UserRepository users;
+    private final DestinationRepository dests;
 
-    public ReviewController(ReviewRepository repo, UserRepository userRepo, TravelPackageRepository pkgRepo) {
+    public ReviewController(ReviewRepository repo, UserRepository users, DestinationRepository dests) {
         this.repo = repo;
-        this.userRepo = userRepo;
-        this.pkgRepo = pkgRepo;
+        this.users = users;
+        this.dests = dests;
     }
 
-    @GetMapping
-    public List<Review> all() {
-        return repo.findAll();
-    }
+   @PostMapping
+public Review create(@RequestParam Long userId,
+                     @RequestParam Long destinationId,
+                     @RequestBody Review r) {
 
-    static class CreateReviewRequest {
-        public Long userId;
-        public Long packageId;
-        public int rating;
-        public String comment;
-    }
+    r.user = users.findById(userId).orElseThrow();
+    r.destination = dests.findById(destinationId).orElseThrow();
 
-    @PostMapping
-    public Review create(@RequestBody CreateReviewRequest req) {
-        UserAccount user = userRepo.findById(req.userId).orElseThrow();
-        TravelPackage pkg = pkgRepo.findById(req.packageId).orElseThrow();
-        return repo.save(new Review(user, pkg, req.rating, req.comment));
-    }
+    return repo.save(r);
+}
+
 }
